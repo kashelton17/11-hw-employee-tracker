@@ -3,7 +3,7 @@ require('console.table')
 const mysql = require('mysql');
 require('dotenv').config()
 
-const questions = ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Update employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
+const questions = ['View all employees', 'View employees by manager', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Update employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
 
 var managers
 var roles
@@ -50,7 +50,7 @@ connection.connect(function (err) {
 
 
 const viewEmployees = () => {
-    const query =  `SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.name AS department, roles.salary, CONCAT(manager.first_name, ' ', manager.last_name) AS manager FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id;`
+    const query =  `SELECT employees.id "ID", CONCAT(employees.first_name, " ", employees.last_name) "Name", roles.title "Title", departments.name "Department", roles.salary "Salary", CONCAT(manager.first_name, ' ', manager.last_name) "Manager" FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id;`
     connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
@@ -126,6 +126,15 @@ const removeEmployee = (input) => {
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log('Succesfully removed employee from database!')
+        startOver()
+    })
+}
+
+const viewByMan = (input) => {
+    const query = `SELECT employees.id "ID", CONCAT(employees.first_name, " ", employees.last_name) "Name", roles.title "Title", departments.name AS Department, roles.salary "Salary" FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id WHERE employees.manager_id = ${input.manager_id};`
+    connection.query(query, input, (err, res) => {
+        if (err) throw err
+        console.table(res)
         startOver()
     })
 }
@@ -271,6 +280,19 @@ const getQuestions = () => {
                 .then(answers => {
                     updateManager([{manager_id: answers.newManager}, {id: answers.updateE}])
                 })
+            } else if (answer.choice === 'View employees by manager'){
+                inq 
+                    .prompt([
+                        {
+                            type: 'list',
+                            name: 'manager',
+                            message: 'Select a manager: ',
+                            choices: managers
+                        }
+                    ])
+                    .then(answer => {
+                        viewByMan({manager_id: answer.manager})
+                    })
             } else if (answer.choice === 'Remove employee'){
                 inq
                     .prompt([
@@ -284,9 +306,7 @@ const getQuestions = () => {
                     .then(answer => {
                         removeEmployee({id: answer.rmEmployee})
                     })
-            } else if (answer.choice === 'View employees by manager'){
-                query11
-            } else if (answer.choice === 'Remove department') {
+            }  else if (answer.choice === 'Remove department') {
                 query12
             } else if (answer.choice === 'Remove role') {
                 query12
