@@ -8,6 +8,7 @@ const questions = ['View all employees', 'View departments', 'View roles', 'Add 
 var managers
 var roles
 var depts
+var employees
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -34,6 +35,12 @@ connection.connect(function (err) {
         managers =  res.map(manager => ({name: manager.Name, value: manager.ID}))
     })
 
+    const query4 = 'SELECT CONCAT(first_name, " ", last_name) "Name", id "ID" FROM employees'
+    connection.query(query4, (err, res) => {
+        if (err) throw err
+        employees = res.map(emp => ({name: emp.Name, value: emp.ID}))
+    })
+
     getQuestions()
 })
 
@@ -43,6 +50,7 @@ const viewEmployees = () => {
     connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
+        startOver()
     })
 }
 
@@ -51,6 +59,7 @@ const viewDepartments = () =>{
     connection.query(query, input, (err, res)=> {
         if (err) throw err
         console.table(res)
+        startOver()
     })
 }
 
@@ -59,6 +68,7 @@ const viewRoles = () =>{
     connection.query(query, input, (err, res)=> {
         if (err) throw err
         console.table(res)
+        startOver()
     })
 }
 
@@ -67,6 +77,7 @@ const addEmployee = (input) =>{
     connection.query(query, input, (err, res)=> {
         if (err) throw err
         console.table(res)
+        startOver()
     })
 }
 
@@ -75,6 +86,7 @@ const addDepartment = (input) => {
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`succesfully added department ${input}`)
+        startOver()
     })
 }
 
@@ -83,6 +95,7 @@ const addRole = (input) => {
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`succesfully added role ${input.title}`)
+        startOver()
     })
 }
 
@@ -91,10 +104,28 @@ const updateRole = (input) => {
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`Succesfully updated employee role to ${input.role_id}`)
+        startOver()
     })
-
 }
 
+const startOver = () => {
+    inq 
+        .prompt([
+            {
+                type: 'confirm',
+                name: 'exit',
+                message: 'Do you want to continue'
+            }
+        ])
+        .then(answer => {
+            if (answer.exit) {
+                getQuestions()
+            } else {
+                console.log('goodBye')
+                process.exit()
+            }
+        })
+}
 
 
 const getQuestions = () => {
@@ -155,7 +186,7 @@ const getQuestions = () => {
                         }
                     ])
                     .then(answer => {
-                        query.addDepartment({ name: answer.dept})
+                        addDepartment({ name: answer.dept})
                     })
             } else if (answer.choice === 'Add role'){
                 inq 
@@ -171,46 +202,34 @@ const getQuestions = () => {
                             message: 'What is the salary of the role?'
                         },
                         {
-                            type: 'input',
+                            type: 'list',
                             name: 'roleDept',
-                            message: 'What is the department id?'
+                            message: 'What is the department?',
+                            choices: depts
                         }
                     ])
                     .then(answers => {
-                        query.addRole({title: answers.roleTitle, salary: answers.roleSalary, department_id: answers.roleDept})
+                        addRole({title: answers.roleTitle, salary: answers.roleSalary, department_id: answers.roleDept})
                     })
             } else if (answer.choice === 'Update employee role'){
                 inq
                     .prompt([
                         {
-                            type: 'input',
+                            type: 'list',
                             name: 'updateE',
-                            message: 'Enter employee ID'
+                            message: 'Choose employee to update',
+                            choices: employees
                         },
                         {
-                            type: 'input',
+                            type: 'list',
                             name: 'newRole',
-                            message: 'What would you like the new role id to be?'
+                            message: 'Select a role',
+                            choices: roles
                         }
                     ])
                     .then(answers => {
-                        query.updateRole([{role_id: answers.newRole}, {id: answers.updateE}])
-                        inq 
-                            .prompt([
-                                {
-                                    type: 'confirm',
-                                    name: 'exit',
-                                    message: 'Do you want to continue'
-                                }
-                            ])
-                            .then(answer => {
-                                if (answer.exit) {
-                                    getQuestions()
-                                } else {
-                                    console.log('goodBye')
-                                    process.exit()
-                                }
-                            })
+                        updateRole([{role_id: answers.newRole}, {id: answers.updateE}])
+
                     })
             } else if (answer.choice === 'Update employee manager'){
                 query9
