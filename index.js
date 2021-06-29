@@ -67,7 +67,7 @@ const addDepartment = (input) => {
     const query = `INSERT INTO departments SET ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
-        console.log(`succesfully added department ${input}`)
+        console.log(`succesfully added department ${input.name}`)
         startOver()
     })
 }
@@ -289,7 +289,7 @@ const getQuestions = () => {
                             name: 'roleSalary',
                             message: 'What is the salary of the role?',
                             validate: salary => {
-                                if (salary.roleSalary) {
+                                if (salary) {
                                     return true
                                 } else {
                                     return 'Please enter valid salary'
