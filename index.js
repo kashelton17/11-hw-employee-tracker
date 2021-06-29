@@ -212,12 +212,26 @@ const getQuestions = () => {
                         {
                             type: 'input',
                             name: 'firstName',
-                            message: 'Input employee first name'
+                            message: 'Input employee first name',
+                            validate: name => {
+                                if (name) {
+                                    return true
+                                } else {
+                                    return 'Please enter valid name'
+                                }
+                            }
                         },
                         {
                             type: 'input',
                             name: 'lastName',
-                            message: 'Input employee last name'
+                            message: 'Input employee last name',
+                            validate: name => {
+                                if (name) {
+                                    return true
+                                } else {
+                                    return 'Please enter valid name'
+                                }
+                            }
                         },
                         {
                             type: 'list',
@@ -242,7 +256,14 @@ const getQuestions = () => {
                         {
                             type: 'input',
                             name: 'dept',
-                            message: 'What is the name of the department?'
+                            message: 'What is the name of the department?',
+                            validate: name => {
+                                if (name) {
+                                    return true
+                                } else {
+                                    return 'Please enter valid name'
+                                }
+                            }
                         }
                     ])
                     .then(answer => {
@@ -254,12 +275,26 @@ const getQuestions = () => {
                         {
                             type: 'input',
                             name: 'roleTitle',
-                            message: 'What is the name of the new role?'
+                            message: 'What is the name of the new role?',
+                            validate: name => {
+                                if (name) {
+                                    return true
+                                } else {
+                                    return 'Please enter valid role'
+                                }
+                            }
                         },
                         {
                             type: 'input',
                             name: 'roleSalary',
-                            message: 'What is the salary of the role?'
+                            message: 'What is the salary of the role?',
+                            validate: salary => {
+                                if (salary && typeof(salary) === Number) {
+                                    return true
+                                } else {
+                                    return 'Please enter valid salary'
+                                }
+                            }
                         },
                         {
                             type: 'list',
@@ -343,10 +378,17 @@ const getQuestions = () => {
                         name: 'rmDept',
                         message: 'Which department do you want to remove?',
                         choices: depts
+                    },
+                    {
+                        type: 'confirm',
+                        name: 'check',
+                        message: 'Warning: this action could break the database please confirm no employees or roles rely on this department, do you wish to continue?',
                     }
                 ])
                 .then(answer => {
-                    removeDepartment({id: answer.rmDept})
+                    if (answer.check) {
+                        removeDepartment({id: answer.rmDept})
+                    }
                 })
             } else if (answer.choice === 'Remove role') {
                 inq
@@ -356,10 +398,17 @@ const getQuestions = () => {
                         name: 'rmRole',
                         message: 'Which role do you want to remove?',
                         choices: roles
+                    },
+                    {
+                        type: 'confirm',
+                        name: 'check',
+                        message: 'Warning: this action could break the database please confirm no employees rely on this role, do you wish to continue?',
                     }
                 ])
                 .then(answer => {
-                    removeRole({id: answer.rmRole})
+                    if (answer.check) {
+                        removeRole({id: answer.rmRole})
+                    }
                 })
             } else if (answer.choice === 'View budget by department') {
                 inq
