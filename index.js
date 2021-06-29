@@ -3,7 +3,7 @@ require('console.table')
 const mysql = require('mysql');
 require('dotenv').config()
 
-const questions = ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Udate employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
+const questions = ['View all employees', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Update employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
 
 var managers
 var roles
@@ -104,10 +104,28 @@ const addRole = (input) => {
 }
 
 const updateRole = (input) => {
-    const query = `UPDATE employees SET ? WHERE ?`
+    const query = `UPDATE employees SET ? WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
-        console.log(`Succesfully updated employee role to ${input.role_id}`)
+        console.log(`Succesfully updated employee role!`)
+        startOver()
+    })
+}
+
+const updateManager = (input) => {
+    const query = `UPDATE employees SET ? WHERE ?;`
+    connection.query(query, input, (err, res) => {
+        if (err) throw err
+        console.log('Succesfully updated employee manager!')
+        startOver()
+    })
+}
+
+const removeEmployee = (input) => {
+    const query = `DELETE FROM employees WHERE ?;`
+    connection.query(query, input, (err, res) => {
+        if (err) throw err
+        console.log('Succesfully removed employee from database!')
         startOver()
     })
 }
@@ -235,10 +253,38 @@ const getQuestions = () => {
                         updateRole([{role_id: answers.newRole}, {id: answers.updateE}])
                     })
             } else if (answer.choice === 'Update employee manager'){
-                query9
+                inq
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'updateE',
+                        message: 'Choose employee to update',
+                        choices: employees
+                    },
+                    {
+                        type: 'list',
+                        name: 'newManager',
+                        message: 'Select a new Manager',
+                        choices: managers
+                    }
+                ])
+                .then(answers => {
+                    updateManager([{manager_id: answers.newManager}, {id: answers.updateE}])
+                })
             } else if (answer.choice === 'Remove employee'){
-                query10
-            } else if (answer.choice === 'Update employee manager'){
+                inq
+                    .prompt([
+                        {
+                            type: 'list',
+                            name: 'rmEmployee',
+                            message: 'Which employee do you want to remove?',
+                            choices: employees
+                        }
+                    ])
+                    .then(answer => {
+                        removeEmployee({id: answer.rmEmployee})
+                    })
+            } else if (answer.choice === 'View employees by manager'){
                 query11
             } else if (answer.choice === 'Remove department') {
                 query12
