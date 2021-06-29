@@ -10,6 +10,7 @@ var roles
 var depts
 var employees
 
+//creating connection to database
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -18,15 +19,14 @@ const connection = mysql.createConnection({
     database: process.env.DB_NAME
 })
 
+// starting connection
 connection.connect(function (err) {
     if (err) throw err
-
-
 
     getQuestions()
 })
 
-
+// creating query functions
 const viewEmployees = () => {
     const query =  `SELECT employees.id "ID", CONCAT(employees.first_name, " ", employees.last_name) "Name", roles.title "Title", departments.name "Department", roles.salary "Salary", CONCAT(manager.first_name, ' ', manager.last_name) "Manager" FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id;`
     connection.query(query, (err, res)=> {
@@ -58,7 +58,6 @@ const addEmployee = (input) =>{
     const query =  `INSERT INTO employees SET ? ;`
     connection.query(query, input, (err, res)=> {
         if (err) throw err
-        console.table(res)
         startOver()
     })
 }
@@ -143,6 +142,7 @@ const viewBudget = (input) => {
     })
 }
 
+//creating a loop
 const startOver = () => {
     inq 
         .prompt([
@@ -164,6 +164,8 @@ const startOver = () => {
 
 
 const getQuestions = () => {
+
+    //getting data that we will use in inquirer prompts
     const query1 = 'SELECT roles.id "ID", roles.title "Title", roles.salary "Salary" FROM roles;' 
     connection.query(query1, (err, res)=> {
         if (err) throw err
@@ -187,6 +189,7 @@ const getQuestions = () => {
         if (err) throw err
         employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.id}))
     })
+    //main inq prompts
     inq 
         .prompt([
             {
@@ -196,6 +199,7 @@ const getQuestions = () => {
                 choices: questions
             }
         ])
+        // after selecting what user wants to do
         .then(answer => {
             console.log(answer.choice)
             if (answer.choice === 'View all employees'){

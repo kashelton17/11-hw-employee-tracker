@@ -23,7 +23,7 @@
 
  
  ## Installation 
-download repository and npm i 
+download repository and npm i, create database and tables using schema.db
 
  
  ## Usage 
