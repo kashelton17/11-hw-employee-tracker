@@ -143,16 +143,16 @@ const removeDepartment = (input) => {
     const query = `DELETE FROM departments WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
-        console.log('Succesfully removed employee from database!')
+        console.log('Succesfully removed department from database!')
         startOver()
     })
 }
 
-const removerole = (input) => {
+const removeRole = (input) => {
     const query = `DELETE FROM roles WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
-        console.log('Succesfully removed employee from database!')
+        console.log('Succesfully removed role from database!')
         startOver()
     })
 }
@@ -333,9 +333,31 @@ const getQuestions = () => {
                         removeEmployee({id: answer.rmEmployee})
                     })
             }  else if (answer.choice === 'Remove department') {
-                query12
+                inq
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'rmDept',
+                        message: 'Which department do you want to remove?',
+                        choices: depts
+                    }
+                ])
+                .then(answer => {
+                    removeDepartment({id: answer.rmDept})
+                })
             } else if (answer.choice === 'Remove role') {
-                query12
+                inq
+                .prompt([
+                    {
+                        type: 'list',
+                        name: 'rmRole',
+                        message: 'Which role do you want to remove?',
+                        choices: roles
+                    }
+                ])
+                .then(answer => {
+                    removeRole({id: answer.rmRole})
+                })
             } else if (answer.choice === 'View budget by department') {
                 inq
                     .prompt([
