@@ -3,7 +3,7 @@ require('console.table')
 const mysql = require('mysql');
 require('dotenv').config()
 
-const questions = ['View all employees', 'View employees by manager', 'View departments', 'View roles', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Update employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
+const questions = ['View all employees', 'View employees by manager', 'View departments', 'View roles', 'View budget by department', 'Add employee', 'Add department', 'Add role', 'Update employee role', 'Update employee manager', 'Remove employee', 'Remove department', 'Remove role', 'Exit']
 
 var managers
 var roles
@@ -139,6 +139,32 @@ const viewByMan = (input) => {
     })
 }
 
+const removeDepartment = (input) => {
+    const query = `DELETE FROM departments WHERE ?;`
+    connection.query(query, input, (err, res) => {
+        if (err) throw err
+        console.log('Succesfully removed employee from database!')
+        startOver()
+    })
+}
+
+const removerole = (input) => {
+    const query = `DELETE FROM roles WHERE ?;`
+    connection.query(query, input, (err, res) => {
+        if (err) throw err
+        console.log('Succesfully removed employee from database!')
+        startOver()
+    })
+}
+
+const viewBudget = (input) => {
+    const query = `SELECT d.name "Department", sum(r.salary) "Budget" FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id WHERE r.department_id = ${input.department_id};`
+    connection.query(query, input, (req, res) => {
+        console.table(res)
+        startOver()
+    })
+}
+
 const startOver = () => {
     inq 
         .prompt([
@@ -152,7 +178,7 @@ const startOver = () => {
             if (answer.exit) {
                 getQuestions()
             } else {
-                console.log('goodBye')
+                console.log('Goodbye')
                 process.exit()
             }
         })
@@ -310,6 +336,19 @@ const getQuestions = () => {
                 query12
             } else if (answer.choice === 'Remove role') {
                 query12
+            } else if (answer.choice === 'View budget by department') {
+                inq
+                    .prompt([
+                        {
+                            type: 'list',
+                            name: 'department',
+                            message: 'Choose a department to view budget: ',
+                            choices: depts
+                        }
+                    ])
+                    .then(answer => {
+                        viewBudget({department_id: answer.department})
+                    })
             } else if (answer.choice === 'Exit'){
                 console.log('Goodbye') 
                 process.exit()
