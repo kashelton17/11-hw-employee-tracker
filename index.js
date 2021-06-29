@@ -21,29 +21,7 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err
 
-    const query1 = 'SELECT roles.id "ID", roles.title "Title", roles.salary "Salary" FROM roles;' 
-    connection.query(query1, (err, res)=> {
-        if (err) throw err
-        roles = res.map(role => ({name: role.Title, value: role.ID}))
-    })
-    
-    const query2 = 'SELECT * from departments;'
-    connection.query(query2, function (err, res) {
-        if (err) throw err
-        depts = res.map(dep => ({name: dep.name, value: dep.id}))
-      })
-    
-    const query3 =  'SELECT CONCAT(first_name, " ", last_name) "Name", employees.id "ID" FROM employees LEFT JOIN roles ON role_id = roles.id WHERE roles.title = "Manager";'
-    connection.query(query3, (err, res) => {
-        if (err) throw err
-        managers =  res.map(manager => ({name: manager.Name, value: manager.ID}))
-    })
 
-    const query4 = 'SELECT * FROM employees;'
-    connection.query(query4, (err, res) => {
-        if (err) throw err
-        employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.ID}))
-    })
 
     getQuestions()
 })
@@ -59,8 +37,8 @@ const viewEmployees = () => {
 }
 
 const viewDepartments = () =>{
-    const query =  `SELECT name 'Department Name' FROM departments;`
-    connection.query(query, input, (err, res)=> {
+    const query =  `SELECT id "ID", name 'Department Name' FROM departments;`
+    connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
         startOver()
@@ -69,7 +47,7 @@ const viewDepartments = () =>{
 
 const viewRoles = () =>{
     const query =  `SELECT title 'Title', salary 'Salary', d.name 'Department' FROM roles LEFT JOIN departments d ON department_id = d.id;`
-    connection.query(query, input, (err, res)=> {
+    connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
         startOver()
@@ -186,6 +164,29 @@ const startOver = () => {
 
 
 const getQuestions = () => {
+    const query1 = 'SELECT roles.id "ID", roles.title "Title", roles.salary "Salary" FROM roles;' 
+    connection.query(query1, (err, res)=> {
+        if (err) throw err
+        roles = res.map(role => ({name: role.Title, value: role.ID}))
+    })
+    
+    const query2 = 'SELECT * from departments;'
+    connection.query(query2, function (err, res) {
+        if (err) throw err
+        depts = res.map(dep => ({name: dep.name, value: dep.id}))
+      })
+    
+    const query3 =  'SELECT CONCAT(first_name, " ", last_name) "Name", employees.id "ID" FROM employees LEFT JOIN roles ON role_id = roles.id WHERE roles.title = "Manager";'
+    connection.query(query3, (err, res) => {
+        if (err) throw err
+        managers =  res.map(manager => ({name: manager.Name, value: manager.ID}))
+    })
+
+    const query4 = 'SELECT * FROM employees;'
+    connection.query(query4, (err, res) => {
+        if (err) throw err
+        employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.ID}))
+    })
     inq 
         .prompt([
             {
@@ -204,6 +205,8 @@ const getQuestions = () => {
             } else if (answer.choice === 'View roles'){
                 viewRoles()
             } else if (answer.choice === 'Add employee'){
+                let manOptions = managers
+                manOptions.push({name: 'None', value: null})
                 inq
                     .prompt([
                         {
@@ -226,7 +229,7 @@ const getQuestions = () => {
                             type: 'list',
                             name: 'chosenManager',
                             message: 'Choose a Manager',
-                            choices: managers
+                            choices: manOptions
                         }
                     ])
                     .then(answers => {
