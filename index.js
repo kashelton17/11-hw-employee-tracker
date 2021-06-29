@@ -185,7 +185,7 @@ const getQuestions = () => {
     const query4 = 'SELECT * FROM employees;'
     connection.query(query4, (err, res) => {
         if (err) throw err
-        employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.ID}))
+        employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.id}))
     })
     inq 
         .prompt([
@@ -289,7 +289,7 @@ const getQuestions = () => {
                             name: 'roleSalary',
                             message: 'What is the salary of the role?',
                             validate: salary => {
-                                if (salary && typeof(salary) === Number) {
+                                if (salary.roleSalary) {
                                     return true
                                 } else {
                                     return 'Please enter valid salary'
