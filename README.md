@@ -4,7 +4,7 @@
  
  ## Description 
  This Node.JS application allows a user to view add update and remove employees
- ![preview Image 1](./lib/images/previewImage1.png)  
+ [![preview Image 1](./lib/images/previewImage1.png)](https://drive.google.com/file/d/1EP-yees8--p-B-umsyu-ddA-ZUlQOuyH/preview)
 
  
  ## Table of Contents 
