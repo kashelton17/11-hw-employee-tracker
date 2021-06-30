@@ -36,7 +36,7 @@ const viewEmployees = () => {
     })
 }
 
-const viewDepartment = () =>{
+const viewDepartments = () =>{
     const query =  `SELECT id "ID", name 'Department Name' FROM department;`
     connection.query(query, (err, res)=> {
         if (err) throw err
@@ -45,7 +45,7 @@ const viewDepartment = () =>{
     })
 }
 
-const viewRole = () =>{
+const viewRoles = () =>{
     const query =  `SELECT title 'Title', salary 'Salary', d.name 'Department' FROM role LEFT JOIN department d ON department_id = d.id;`
     connection.query(query, (err, res)=> {
         if (err) throw err
