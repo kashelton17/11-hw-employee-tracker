@@ -28,7 +28,7 @@ connection.connect(function (err) {
 
 // creating query functions
 const viewEmployees = () => {
-    const query =  `SELECT employees.id "ID", CONCAT(employees.first_name, " ", employees.last_name) "Name", roles.title "Title", departments.name "Department", roles.salary "Salary", CONCAT(manager.first_name, ' ', manager.last_name) "Manager" FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id;`
+    const query =  `SELECT employee.id "ID", CONCAT(employee.first_name, " ", employee.last_name) "Name", role.title "Title", department.name "Department", role.salary "Salary", CONCAT(manager.first_name, ' ', manager.last_name) "Manager" FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id;`
     connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
@@ -36,8 +36,8 @@ const viewEmployees = () => {
     })
 }
 
-const viewDepartments = () =>{
-    const query =  `SELECT id "ID", name 'Department Name' FROM departments;`
+const viewDepartment = () =>{
+    const query =  `SELECT id "ID", name 'Department Name' FROM department;`
     connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
@@ -45,8 +45,8 @@ const viewDepartments = () =>{
     })
 }
 
-const viewRoles = () =>{
-    const query =  `SELECT title 'Title', salary 'Salary', d.name 'Department' FROM roles LEFT JOIN departments d ON department_id = d.id;`
+const viewRole = () =>{
+    const query =  `SELECT title 'Title', salary 'Salary', d.name 'Department' FROM role LEFT JOIN department d ON department_id = d.id;`
     connection.query(query, (err, res)=> {
         if (err) throw err
         console.table(res)
@@ -55,7 +55,7 @@ const viewRoles = () =>{
 }
 
 const addEmployee = (input) =>{
-    const query =  `INSERT INTO employees SET ? ;`
+    const query =  `INSERT INTO employee SET ? ;`
     connection.query(query, input, (err, res)=> {
         if (err) throw err
         startOver()
@@ -63,7 +63,7 @@ const addEmployee = (input) =>{
 }
 
 const addDepartment = (input) => {
-    const query = `INSERT INTO departments SET ?;`
+    const query = `INSERT INTO department SET ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`succesfully added department ${input.name}`)
@@ -72,7 +72,7 @@ const addDepartment = (input) => {
 }
 
 const addRole = (input) => {
-    const query = `INSERT INTO roles SET ?;`
+    const query = `INSERT INTO role SET ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`succesfully added role ${input.title}`)
@@ -81,7 +81,7 @@ const addRole = (input) => {
 }
 
 const updateRole = (input) => {
-    const query = `UPDATE employees SET ? WHERE ?;`
+    const query = `UPDATE employee SET ? WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log(`Succesfully updated employee role!`)
@@ -90,7 +90,7 @@ const updateRole = (input) => {
 }
 
 const updateManager = (input) => {
-    const query = `UPDATE employees SET ? WHERE ?;`
+    const query = `UPDATE employee SET ? WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log('Succesfully updated employee manager!')
@@ -99,7 +99,7 @@ const updateManager = (input) => {
 }
 
 const removeEmployee = (input) => {
-    const query = `DELETE FROM employees WHERE ?;`
+    const query = `DELETE FROM employee WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log('Succesfully removed employee from database!')
@@ -108,7 +108,7 @@ const removeEmployee = (input) => {
 }
 
 const viewByMan = (input) => {
-    const query = `SELECT employees.id "ID", CONCAT(employees.first_name, " ", employees.last_name) "Name", roles.title "Title", departments.name AS Department, roles.salary "Salary" FROM employees LEFT JOIN roles on employees.role_id = roles.id LEFT JOIN departments on roles.department_id = departments.id LEFT JOIN employees manager on manager.id = employees.manager_id WHERE employees.manager_id = ${input.manager_id};`
+    const query = `SELECT employee.id "ID", CONCAT(employee.first_name, " ", employee.last_name) "Name", role.title "Title", department.name AS Department, role.salary "Salary" FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on role.department_id = department.id LEFT JOIN employee manager on manager.id = employee.manager_id WHERE employee.manager_id = ${input.manager_id};`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.table(res)
@@ -117,7 +117,7 @@ const viewByMan = (input) => {
 }
 
 const removeDepartment = (input) => {
-    const query = `DELETE FROM departments WHERE ?;`
+    const query = `DELETE FROM department WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log('Succesfully removed department from database!')
@@ -126,7 +126,7 @@ const removeDepartment = (input) => {
 }
 
 const removeRole = (input) => {
-    const query = `DELETE FROM roles WHERE ?;`
+    const query = `DELETE FROM role WHERE ?;`
     connection.query(query, input, (err, res) => {
         if (err) throw err
         console.log('Succesfully removed role from database!')
@@ -135,7 +135,7 @@ const removeRole = (input) => {
 }
 
 const viewBudget = (input) => {
-    const query = `SELECT d.name "Department", sum(r.salary) "Budget" FROM employees e LEFT JOIN roles r ON e.role_id = r.id LEFT JOIN departments d ON r.department_id = d.id WHERE r.department_id = ${input.department_id};`
+    const query = `SELECT d.name "Department", sum(r.salary) "Budget" FROM employee e LEFT JOIN role r ON e.role_id = r.id LEFT JOIN department d ON r.department_id = d.id WHERE r.department_id = ${input.department_id};`
     connection.query(query, input, (req, res) => {
         console.table(res)
         startOver()
@@ -149,7 +149,7 @@ const startOver = () => {
             {
                 type: 'confirm',
                 name: 'exit',
-                message: 'Do you want to continue'
+                message: 'Do you want to continue?'
             }
         ])
         .then(answer => {
@@ -166,25 +166,25 @@ const startOver = () => {
 const getQuestions = () => {
 
     //getting data that we will use in inquirer prompts
-    const query1 = 'SELECT roles.id "ID", roles.title "Title", roles.salary "Salary" FROM roles;' 
+    const query1 = 'SELECT role.id "ID", role.title "Title", role.salary "Salary" FROM role;' 
     connection.query(query1, (err, res)=> {
         if (err) throw err
         roles = res.map(role => ({name: role.Title, value: role.ID}))
     })
     
-    const query2 = 'SELECT * from departments;'
+    const query2 = 'SELECT * from department;'
     connection.query(query2, function (err, res) {
         if (err) throw err
         depts = res.map(dep => ({name: dep.name, value: dep.id}))
       })
     
-    const query3 =  'SELECT CONCAT(first_name, " ", last_name) "Name", employees.id "ID" FROM employees LEFT JOIN roles ON role_id = roles.id WHERE roles.title = "Manager";'
+    const query3 =  'SELECT CONCAT(first_name, " ", last_name) "Name", employee.id "ID" FROM employee LEFT JOIN role ON role_id = role.id WHERE role.title = "Manager";'
     connection.query(query3, (err, res) => {
         if (err) throw err
         managers =  res.map(manager => ({name: manager.Name, value: manager.ID}))
     })
 
-    const query4 = 'SELECT * FROM employees;'
+    const query4 = 'SELECT * FROM employee;'
     connection.query(query4, (err, res) => {
         if (err) throw err
         employees = res.map(emp => ({name: `${emp.first_name} ${emp.last_name}`, value: emp.id}))
