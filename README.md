@@ -24,9 +24,9 @@
  
  ## Installation 
  download repository and npm i and add .env file with user, password and database where: 
- DB_NAME=?
- DB_USER=?
- DB_PASSWORD=?
+ * DB_NAME=?
+ * DB_USER=?
+ * DB_PASSWORD=?
 
  
  ## Usage 
